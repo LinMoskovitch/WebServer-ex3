@@ -1,17 +1,16 @@
 #include "HTTPRequestHandler.h"
 
 
-string HTTPRequestHandler::extractHTTPVerb(int index, SocketState* sockets)
+string HTTPRequestHandler::makeRequestToString(int index, SocketState* sockets)
 {
 	string bufferStr = string(sockets[index].buffer);
-	int spaceIndex = bufferStr.find(' ');
+	int spaceIndex = bufferStr.find(" ");
 	string bufferRequestType = bufferStr.substr(spaceIndex);
 
 	int firstRequestLastIndex;
 	if (bufferRequestType.find("GET") != string::npos)
 	{
 		firstRequestLastIndex = bufferRequestType.find("GET") + spaceIndex;
-
 	}
 	else if (bufferRequestType.find("POST") != string::npos)
 	{
@@ -47,42 +46,52 @@ string HTTPRequestHandler::extractHTTPVerb(int index, SocketState* sockets)
 	string remainedStrBuffer = bufferStr.substr(firstRequestLastIndex + 1);
 	strcpy(sockets[index].buffer, remainedStrBuffer.c_str());
 	sockets[index].len = remainedStrBuffer.size();
-
-	spaceIndex = firstRequest.find(" ");
-	string requestType = firstRequest.substr(0, spaceIndex);
-
-	return requestType;
+	return firstRequest;
 }
 
-string HTTPRequestHandler::handleRequest(string currentRequest)
+string HTTPRequestHandler::handleRequest(DTO dto)
 {
 	string httpResponse;
-	if (currentRequest == "GET") {
-		httpResponse = HTTPFunctions::Get(currentRequest);
+	if (dto.requestType == "GET") {
+		httpResponse = HTTPFunctions::Get(dto.request);
 	}
-	else if (currentRequest == "POST") {
-		httpResponse = HTTPFunctions::Post(currentRequest);
+	else if (dto.requestType == "POST") {
+		httpResponse = HTTPFunctions::Post(dto.request);
 	}
-	else if (currentRequest == "HEAD") {
-		httpResponse = HTTPFunctions::Head(currentRequest);
+	else if (dto.requestType == "HEAD") {
+		httpResponse = HTTPFunctions::Head(dto.request);
 	}
-	else if (currentRequest == "PUT") {
-		httpResponse = HTTPFunctions::Put(currentRequest);
+	else if (dto.requestType == "PUT") {
+		httpResponse = HTTPFunctions::Put(dto.request);
 	}
-	else if (currentRequest == "TRACE") {
-		httpResponse = HTTPFunctions::Trace(currentRequest);
+	else if (dto.requestType == "TRACE") {
+		httpResponse = HTTPFunctions::Trace(dto.request);
 	}
-	else if (currentRequest == "DELETE") {
-		httpResponse = HTTPFunctions::Delete(currentRequest);
+	else if (dto.requestType == "DELETE") {
+		httpResponse = HTTPFunctions::Delete(dto.request);
 	}
-	else if (currentRequest == "OPTIONS") {
-		httpResponse = HTTPFunctions::Options(currentRequest);
+	else if (dto.requestType == "OPTIONS") {
+		httpResponse = HTTPFunctions::Options(dto.request);
 	}
 	else { // unimplemented or illegal request type - return an html page with error message.
-		httpResponse = HTTPFunctions::handleIllegalRequest(currentRequest);
+		httpResponse = HTTPFunctions::handleIllegalRequest(dto.request);
 	}
 
 	return httpResponse;
 }
 
+HTTPRequestHandler::DTO HTTPRequestHandler::extractDataFromRequest(int index, SocketState* sockets) {
+	DTO dto;
+	dto.request = makeRequestToString(index, sockets);
+	dto.requestType = getRequestTypeFrom(dto.request);
 
+	return dto;
+
+}
+
+string HTTPRequestHandler::getRequestTypeFrom(string request) {
+	int spaceIndex = request.find(" ");
+	string requestType = request.substr(0, spaceIndex);
+
+	return requestType;
+}

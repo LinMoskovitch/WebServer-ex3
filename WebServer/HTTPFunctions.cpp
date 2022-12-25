@@ -9,6 +9,7 @@ string HTTPFunctions::Get(string HttpRequest)
 	fileName = fileName.substr(0, fileName.find('?'));
 	string filePath = createFilePath(fileName, langParamValue);
 	string httpResponse = processResponse(filePath, "GET");
+
 	return httpResponse;
 }
 string HTTPFunctions::Post(string HttpRequest)
@@ -16,10 +17,10 @@ string HTTPFunctions::Post(string HttpRequest)
 	string fileName = ExtractResourceName(HttpRequest);
 	fileName = fileName.substr(0, fileName.find('?'));
 	string filePath = createFilePath(fileName, string("none"));
-
 	string requestBody = getRequestBody(HttpRequest);
 	cout << endl << "The request body is: " << (requestBody.empty() ? "Empty" : requestBody) << endl << endl;
 	string httpResponse = processResponse(filePath, "POST");
+
 	return httpResponse;
 }
 
@@ -30,6 +31,7 @@ string HTTPFunctions::Head(string HttpRequest)
 	fileName = fileName.substr(0, fileName.find('?'));
 	string filePath = createFilePath(fileName, langParamValue);
 	string httpResponse = processResponse(filePath, "HEAD");
+
 	return httpResponse;
 }
 
@@ -39,6 +41,7 @@ string HTTPFunctions::Put(string HttpRequest)
 	fileName = fileName.substr(0, fileName.find('?'));
 	string filePath = createFilePath(fileName, string("none"));
 	string httpResponse = processResponse(filePath, "PUT", HttpRequest);
+
 	return httpResponse;
 }
 

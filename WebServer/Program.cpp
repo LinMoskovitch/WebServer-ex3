@@ -1,6 +1,6 @@
 #include "Server.h"
 
-void main()
-{
+
+void main() {
 	Server::run();
 }

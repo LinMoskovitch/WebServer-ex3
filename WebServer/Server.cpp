@@ -7,74 +7,26 @@ void Server::run()
 	int socketsCount = 0;
 
 	cout << "Server start running" << endl;
-	// Initialize Winsock (Windows Sockets).
-
-	// Create a WSADATA object called wsaData.
-	// The WSADATA structure contains information about the Windows 
-	// Sockets implementation.
 	WSAData wsaData;
 
-	// Call WSAStartup and return its value as an integer and check for errors.
-	// The WSAStartup function initiates the use of WS2_32.DLL by a process.
-	// First parameter is the version number 2.2.
-	// The WSACleanup function destructs the use of WS2_32.DLL by a process.
 	if (NO_ERROR != WSAStartup(MAKEWORD(2, 2), &wsaData))
 	{
 		cout << "Http Server: Error at WSAStartup()\n";
 		return;
 	}
 
-	// Server side:
-	// Create and bind a socket to an internet address.
-	// Listen through the socket for incoming connections.
-
-	// After initialization, a SOCKET object is ready to be instantiated.
-
-	// Create a SOCKET object called listenSocket. 
-	// For this application:	use the Internet address family (AF_INET), 
-	//							streaming sockets (SOCK_STREAM), 
-	//							and the TCP/IP protocol (IPPROTO_TCP).
 	SOCKET listenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-
-	// Check for errors to ensure that the socket is a valid socket.
-	// Error detection is a key part of successful networking code. 
-	// If the socket call fails, it returns INVALID_SOCKET. 
-	// The if statement in the previous code is used to catch any errors that
-	// may have occurred while creating the socket. WSAGetLastError returns an 
-	// error number associated with the last error that occurred.
 	if (INVALID_SOCKET == listenSocket)
 	{
 		cout << "Http Server: Error at socket(): " << WSAGetLastError() << endl;
 		WSACleanup();
 		return;
 	}
-
-	// For a server to communicate on a network, it must bind the socket to 
-// a network address.
-
-// Need to assemble the required data for connection in sockaddr structure.
-
-// Create a sockaddr_in object called serverService. 
 	sockaddr_in serverService;
 	// Address family (must be AF_INET - Internet address family).
 	serverService.sin_family = AF_INET;
-	// IP address. The sin_addr is a union (s_addr is a unsigned long 
-	// (4 bytes) data type).
-	// inet_addr (Iternet address) is used to convert a string (char *) 
-	// into unsigned long.
-	// The IP address is INADDR_ANY to accept connections on all interfaces.
 	serverService.sin_addr.s_addr = INADDR_ANY;
-	// IP Port. The htons (host to network - short) function converts an
-	// unsigned short from host to TCP/IP network byte order 
-	// (which is big-endian).
 	serverService.sin_port = htons(HTTP_PORT);
-
-	// Bind the socket for client's requests.
-
-// The bind function establishes a connection to a specified socket.
-// The function uses the socket handler, the sockaddr structure (which
-// defines properties of the desired connection) and the length of the
-// sockaddr structure (in bytes).
 	if (SOCKET_ERROR == bind(listenSocket, (SOCKADDR*)&serverService, sizeof(serverService)))
 	{
 		cout << "Http Server: Error at bind(): " << WSAGetLastError() << endl;
@@ -82,9 +34,6 @@ void Server::run()
 		WSACleanup();
 		return;
 	}
-	// Listen on the Socket for incoming connections.
-	// This socket accepts only one connection (no pending connections 
-	// from other clients). This sets the backlog parameter.
 	if (SOCKET_ERROR == listen(listenSocket, 5))
 	{
 		cout << "Http Server: Error at listen(): " << WSAGetLastError() << endl;
@@ -99,17 +48,8 @@ void Server::run()
 	// Accept connections and handles them one by one.
 	while (true)
 	{
-		// The select function determines the status of one or more sockets,
-		// waiting if necessary, to perform asynchronous I/O. Use fd_sets for
-		// sets of handles for reading, writing and exceptions. select gets "timeout" for waiting
-		// and still performing other operations (Use NULL for blocking). Finally,
-		// select returns the number of descriptors which are ready for use (use FD_ISSET
-		// macro to check which descriptor in each set is ready to be used).
 		timeout.tv_sec = TWO_MINUTES;
 		timeout.tv_usec = 0;
-
-		// find the active sockets that the server didn't get any message from them for at least 2 minutes - and close their socket.
-		// start from index 1 (for not closing listenSocket).
 		fd_set waitRecv;
 		FD_ZERO(&waitRecv);
 		for (int i = 0; i < MAX_SOCKETS; i++)
@@ -177,9 +117,6 @@ void Server::run()
 
 bool Server::addSocket(SOCKET id, int what, SocketState* sockets, int* socketsCount)
 {
-	//
-// Set the socket to be in non-blocking mode.
-//
 	unsigned long flag = 1;
 	if (ioctlsocket(id, FIONBIO, &flag) != 0)
 	{
@@ -268,7 +205,6 @@ void Server::receiveMessage(int index, SocketState* sockets, int* socketsCount)
 	else
 	{
 		sockets[index].buffer[len + bytesRecv] = '\0'; //add the null-terminating to make it a string
-		//cout << "Http Server: Recieved: " << bytesRecv << " bytes of \"" << &sockets[index].buffer[len] << "\" message.\n";
 		sockets[index].len += bytesRecv;
 		sockets[index].lastMessageTime = time(0);
 
@@ -280,14 +216,16 @@ void Server::receiveMessage(int index, SocketState* sockets, int* socketsCount)
 	}
 }
 
-void Server::sendMessage(int index, SocketState* sockets, int* socketsCount)
-{
+void Server::sendMessage(int index, SocketState* sockets, int* socketsCount) {
 	int bytesSent = 0;
 	char sendBuff[10000];
 	string httpResponse;
 	SOCKET msgSocket = sockets[index].id;
-	string currentRequest = HTTPRequestHandler::extractHTTPVerb(index, sockets);
-	httpResponse = HTTPRequestHandler::handleRequest(currentRequest);
+	HTTPRequestHandler::DTO dto = HTTPRequestHandler::extractDataFromRequest(
+		index, 
+		sockets
+	);
+	httpResponse = HTTPRequestHandler::handleRequest(dto);
 	strcpy(sendBuff, httpResponse.c_str());
 
 	bytesSent = send(msgSocket, sendBuff, (int)strlen(sendBuff), 0);
