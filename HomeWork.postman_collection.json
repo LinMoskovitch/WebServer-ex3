@@ -1,0 +1,153 @@
+{
+	"info": {
+		"_postman_id": "d8704872-af95-4073-8c02-8e7a1300f362",
+		"name": "HomeWork",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "17475197"
+	},
+	"item": [
+		{
+			"name": "File With language",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/site.html?lang=en",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"site.html"
+					],
+					"query": [
+						{
+							"key": "lang",
+							"value": "en"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8080/site.html",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "\"Hey World!\""
+				},
+				"url": {
+					"raw": "http://localhost:8080/site.html",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"site.html"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8080/site.html\n\n",
+			"request": {
+				"method": "HEAD",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/site.html\n\n",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"site.html\n\n"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8080/somefile.html",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/somefile.html",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"somefile.html"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8080/site.html",
+			"request": {
+				"method": "OPTIONS",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/site.html",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"site.html"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8080/myfile.html\n\n",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/somefile.html",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"somefile.html"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8080/site.html",
+			"request": {
+				"method": "TRACE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/site.html",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"site.html"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
